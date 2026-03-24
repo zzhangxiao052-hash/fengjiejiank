@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奉节县数智工业运营中心 - 视频监控</title>
+    <style>
+        :root {
+            --bg-color: #020b1a; /* Deep Space Navy */
+            --section-bg: #051224;
+            --accent-color: #00f2ff; /* Electric Cyan */
+            --card-bg: rgba(26, 58, 90, 0.4);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --status-online: #00ff88;
+            --status-offline: #ff4d4d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 顶部样式 */
+        .header {
+            background: var(--section-bg);
+            padding: 15px 40px;
+            border-bottom: 1px solid var(--accent-color);
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: center; /* 居中聚集 */
+            gap: 50px; /* 添加间距 */
+            align-items: center;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: normal;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .header-dropdown {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            padding: 6px 16px;
+            border-radius: 3px;
+            color: var(--accent-color);
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .header-icon {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: transparent;
+            color: var(--accent-color);
+        }
+
+        .header-icon:hover {
+            background: rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+        }
+
+        /* 搜索区域 */
+        .search-section {
+            padding: 20px 40px;
+            background: var(--section-bg);
+            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
+        }
+
+        .search-container {
+            max-width: 700px; /* Adjusted max-width to center the input and button */
+            margin: 0 auto;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center; /* Center the input and button within the container */
+        }
+
+        .search-input {
+            /* flex: 1; */ /* Removed to prevent stretching */
+            max-width: 500px;
+            padding: 10px 18px;
+            background: rgba(0, 242, 255, 0.05);
+            border: 1px solid var(--accent-color);
+            border-radius: 3px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input::placeholder {
+            color: rgba(0, 242, 255, 0.4);
+        }
+
+        .search-input:focus {
+            background: rgba(0, 242, 255, 0.08);
+            box-shadow: 0 0 8px var(--accent-color);
+        }
+
+        .search-btn {
+            padding: 10px 25px;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 3px;
+            color: var(--bg-color);
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            box-shadow: 0 0 15px var(--accent-color);
+            transform: translateY(-1px);
+        }
+
+        /* 主体内容区域 */
+        .main-content {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+            background: var(--bg-color);
+        }
+
+        .camera-grid {
+            max-width: 940px; /* Adjusted to fit 4 columns while maintaining perceived card size */
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .camera-card {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .camera-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 242, 255, 0.3);
+            background: rgba(26, 58, 90, 0.8);
+        }
+
+        .camera-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .camera-name {
+            font-size: 16px;
+            font-weight: normal;
+            color: var(--text-primary);
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-online {
+            background: var(--status-online);
+            box-shadow: 0 0 8px var(--status-online);
+        }
+
+        .status-offline {
+            background: var(--status-offline);
+            box-shadow: 0 0 8px var(--status-offline);
+        }
+
+        .status-text-online {
+            color: var(--status-online);
+        }
+
+        .status-text-offline {
+            color: var(--status-offline);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .camera-info {
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .info-label {
+            color: var(--accent-color);
+        }
+
+        .view-btn {
+            width: 100%;
+            padding: 8px;
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            border-radius: 3px;
+            color: var(--accent-color);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .view-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        /* 分页样式 */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+            gap: 15px;
+            color: var(--text-primary);
+        }
+
+        .pagination-btn {
+            background: var(--section-bg);
+            border: 1px solid var(--accent-color);
+            padding: 8px 15px;
+            border-radius: 3px;
+            color: var(--accent-color);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-numbers {
+            display: flex;
+            gap: 8px;
+        }
+
+        .page-number-btn {
+            background: var(--section-bg);
+            border: 1px solid var(--accent-color);
+            padding: 8px 12px;
+            border-radius: 3px;
+            color: var(--accent-color);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .page-number-btn:hover:not(.active) {
+            background: rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .page-number-btn.active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 15px var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* 底部样式 */
+        .footer {
+            background: var(--section-bg);
+            padding: 25px 40px;
+            border-top: 1px solid rgba(0, 242, 255, 0.3);
+        }
+
+        .footer-icons {
+            max-width: 1920px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 35px;
+            flex-wrap: wrap;
+        }
+
+        .footer-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .icon-circle {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: rgba(0, 242, 255, 0.05);
+            border: 1px solid var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+        }
+
+        .footer-icon:hover .icon-circle {
+            background: rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .footer-icon.active .icon-circle {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px var(--accent-color);
+            transform: translateY(-3px);
+        }
+
+        .icon-label {
+            font-size: 12px;
+            color: var(--accent-color);
+        }
+
+        .footer-icon.active .icon-label {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部 -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-title">奉节县数智工业运营中心</div>
+            <div class="header-icons">
+                <div class="header-dropdown">≡ 工业一张图</div>
+                <div class="header-icon">✉</div>
+                <div class="header-icon">🌐</div>
+                <div class="header-icon">⏻</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 搜索区域 -->
+    <section class="search-section">
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="请输入摄像头名称或位置进行搜索...">
+            <button class="search-btn">搜索</button>
+        </div>
+    </section>
+
+    <!-- 主体内容 -->
+    <main class="main-content">
+        <div class="camera-grid">
+            <!-- 摄像头卡片 1 -->
+            <div class="camera-card">
+                <div class="camera-header">
+                    <div class="camera-name">草堂工业园-全景</div>
+                    <div class="status-indicator status-online"></div>
+                </div>
+                <div class="camera-info">
+                    <div class="info-row">
+                        <span class="info-label">设备编号：</span>
+                        <span>CAM-001</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">安装位置：</span>
+                        <span>园区东门</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">设备状态：</span>
+                        <span class="status-text-online">在线</span>
+                    </div>
+                </div>
+                <button class="view-btn">点击查看监控画面</button>
+            </div>
+
+            <!-- 摄像头卡片 2 -->
+            <div class="camera-card">
+                <div class="camera-header">
+                    <div class="camera-name">test</div>
+                    <div class="status-indicator status-online"></div>
+                </div>
+                <div class="camera-info">
+                    <div class="info-row">
+                        <span class="info-label">设备编号：</span>
+                        <span>CAM-002</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">安装位置：</span>
+                        <span>测试区域</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">设备状态：</span>
+                        <span class="status-text-online">在线</span>
+                    </div>
+                </div>
+                <button class="view-btn">点击查看监控画面</button>
+            </div>
+
+            <!-- 摄像头卡片 3 -->
+            <div class="camera-card">
+                <div class="camera-header">
+                    <div class="camera-name">金凤山风光电-全景</div>
+                    <div class="status-indicator status-offline"></div>
+                </div>
+                <div class="camera-info">
+                    <div class="info-row">
+                        <span class="info-label">设备编号：</span>
+                        <span>CAM-003</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">安装位置：</span>
+                        <span>金凤山顶</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">设备状态：</span>
+                        <span class="status-text-offline">离线</span>
+                    </div>
+                </div>
+                <button class="view-btn">点击查看监控画面</button>
+            </div>
+
+            <!-- 摄像头卡片 4 -->
+            <div class="camera-card">
+                <div class="camera-header">
+                    <div class="camera-name">园区西门监控</div>
+                    <div class="status-indicator status-online"></div>
+                </div>
+                <div class="camera-info">
+                    <div class="info-row">
+                        <span class="info-label">设备编号：</span>
+                        <span>CAM-004</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">安装位置：</span>
+                        <span>园区西门</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">设备状态：</span>
+                        <span class="status-text-online">在线</span>
+                    </div>
+                </div>
+                <button class="view-btn">点击查看监控画面</button>
+            </div>
+
+            <!-- 摄像头卡片 5 -->
+            <div class="camera-card">
+                <div class="camera-header">
+                    <div class="camera-name">生产车间A区</div>
+                    <div class="status-indicator status-online"></div>
+                </div>
+                <div class="camera-info">
+                    <div class="info-row">
+                        <span class="info-label">设备编号：</span>
+                        <span>CAM-005</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">安装位置：</span>
+                        <span>A区车间</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">设备状态：</span>
+                        <span class="status-text-online">在线</span>
+                    </div>
+                </div>
+                <button class="view-btn">点击查看监控画面</button>
+            </div>
+
+            <!-- 摄像头卡片 6 -->
+            <div class="camera-card">
+                <div class="camera-header">
+                    <div class="camera-name">仓储物流区</div>
+                    <div class="status-indicator status-online"></div>
+                </div>
+                <div class="camera-info">
+                    <div class="info-row">
+                        <span class="info-label">设备编号：</span>
+                        <span>CAM-006</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">安装位置：</span>
+                        <span>物流中心</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">设备状态：</span>
+                        <span class="status-text-online">在线</span>
+                    </div>
+                </div>
+                <button class="view-btn">点击查看监控画面</button>
+            </div>
+
+            <!-- 摄像头卡片 7 -->
+            <div class="camera-card">
+                <div class="camera-header">
+                    <div class="camera-name">办公楼大厅</div>
+                    <div class="status-indicator status-online"></div>
+                </div>
+                <div class="camera-info">
+                    <div class="info-row">
+                        <span class="info-label">设备编号：</span>
+                        <span>CAM-007</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">安装位置：</span>
+                        <span>办公楼1F</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">设备状态：</span>
+                        <span class="status-text-online">在线</span>
+                    </div>
+                </div>
+                <button class="view-btn">点击查看监控画面</button>
+            </div>
+
+            <!-- 摄像头卡片 8 -->
+            <div class="camera-card">
+                <div class="camera-header">
+                    <div class="camera-name">停车场监控</div>
+                    <div class="status-indicator status-offline"></div>
+                </div>
+                <div class="camera-info">
+                    <div class="info-row">
+                        <span class="info-label">设备编号：</span>
+                        <span>CAM-008</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">安装位置：</span>
+                        <span>地下停车场</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">设备状态：</span>
+                        <span class="status-text-offline">离线</span>
+                    </div>
+                </div>
+                <button class="view-btn">点击查看监控画面</button>
+            </div>
+
+            <!-- 摄像头卡片 9 -->
+            <div class="camera-card">
+                <div class="camera-header">
+                    <div class="camera-name">数据中心机房</div>
+                    <div class="status-indicator status-online"></div>
+                </div>
+                <div class="camera-info">
+                    <div class="info-row">
+                        <span class="info-label">设备编号：</span>
+                        <span>CAM-009</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">安装位置：</span>
+                        <span>数据中心</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">设备状态：</span>
+                        <span class="status-text-online">在线</span>
+                    </div>
+                </div>
+                <button class="view-btn">点击查看监控画面</button>
+            </div>
+
+            <!-- 摄像头卡片 10 -->
+            <div class="camera-card">
+                <div class="camera-header">
+                    <div class="camera-name">财务部办公室</div>
+                    <div class="status-indicator status-online"></div>
+                </div>
+                <div class="camera-info">
+                    <div class="info-row">
+                        <span class="info-label">设备编号：</span>
+                        <span>CAM-010</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">安装位置：</span>
+                        <span>行政楼2F</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">设备状态：</span>
+                        <span class="status-text-online">在线</span>
+                    </div>
+                </div>
+                <button class="view-btn">点击查看监控画面</button>
+            </div>
+
+            <!-- 摄像头卡片 11 -->
+            <div class="camera-card">
+                <div class="camera-header">
+                    <div class="camera-name">生产车间B区</div>
+                    <div class="status-indicator status-offline"></div>
+                </div>
+                <div class="camera-info">
+                    <div class="info-row">
+                        <span class="info-label">设备编号：</span>
+                        <span>CAM-011</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">安装位置：</span>
+                        <span>B区车间</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">设备状态：</span>
+                        <span class="status-text-offline">离线</span>
+                    </div>
+                </div>
+                <button class="view-btn">点击查看监控画面</button>
+            </div>
+
+            <!-- 摄像头卡片 12 -->
+            <div class="camera-card">
+                <div class="camera-header">
+                    <div class="camera-name">研发中心实验室</div>
+                    <div class="status-indicator status-online"></div>
+                </div>
+                <div class="camera-info">
+                    <div class="info-row">
+                        <span class="info-label">设备编号：</span>
+                        <span>CAM-012</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">安装位置：</span>
+                        <span>研发大楼3F</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">设备状态：</span>
+                        <span class="status-text-online">在线</span>
+                    </div>
+                </div>
+                <button class="view-btn">点击查看监控画面</button>
+            </div>
+        </div>
+        </main>
+
+        <div class="pagination-container">
+        <button id="prevPage" class="pagination-btn">上一页</button>
+        <div id="pageNumbers" class="page-numbers"></div>
+        <button id="nextPage" class="pagination-btn">下一页</button>
+        </div>
+
+    <!-- 底部 -->
+    <footer class="footer">
+        <div class="footer-icons">
+            <div class="footer-icon">
+                <div class="icon-circle">🏠</div>
+                <div class="icon-label">全员概况</div>
+            </div>
+            <div class="footer-icon">
+                <div class="icon-circle">🏦</div>
+                <div class="icon-label">园区金融</div>
+            </div>
+            <div class="footer-icon">
+                <div class="icon-circle">💎</div>
+                <div class="icon-label">招商引资</div>
+            </div>
+            <div class="footer-icon">
+                <div class="icon-circle">🏗</div>
+                <div class="icon-label">规划建设</div>
+            </div>
+            <div class="footer-icon">
+                <div class="icon-circle">📊</div>
+                <div class="icon-label">经济运行</div>
+            </div>
+            <div class="footer-icon">
+                <div class="icon-circle">📋</div>
+                <div class="icon-label">资产盘点</div>
+            </div>
+            <div class="footer-icon">
+                <div class="icon-circle">💼</div>
+                <div class="icon-label">企业服务</div>
+            </div>
+            <div class="footer-icon active">
+                <div class="icon-circle">🎯</div>
+                <div class="icon-label">视频监控</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const cameraCards = document.querySelectorAll('.camera-card');
+        const paginationContainer = document.querySelector('.pagination-container');
+        const pageNumbersContainer = document.getElementById('pageNumbers');
+        const prevButton = document.getElementById('prevPage');
+        const nextButton = document.getElementById('nextPage');
+
+        const itemsPerPage = 8; // 每页显示8个摄像头模块
+        let currentPage = 1;
+        const totalPages = Math.ceil(cameraCards.length / itemsPerPage);
+
+        function displayPage(page) {
+            currentPage = page;
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+
+            cameraCards.forEach((card, index) => {
+                if (index >= start && index < end) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            updatePaginationControls();
+        }
+
+        function setupPagination() {
+            pageNumbersContainer.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.classList.add('page-number-btn');
+                pageButton.textContent = i;
+                pageButton.addEventListener('click', () => displayPage(i));
+                pageNumbersContainer.appendChild(pageButton);
+            }
+        }
+
+        function updatePaginationControls() {
+            document.querySelectorAll('.page-number-btn').forEach(button => {
+                button.classList.remove('active');
+                if (parseInt(button.textContent) === currentPage) {
+                    button.classList.add('active');
+                }
+            });
+
+            prevButton.disabled = currentPage === 1;
+            nextButton.disabled = currentPage === totalPages;
+
+            // Optionally hide pagination if only one page
+            if (totalPages <= 1) {
+                paginationContainer.style.display = 'none';
+            } else {
+                paginationContainer.style.display = 'flex';
+            }
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                displayPage(currentPage - 1);
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                displayPage(currentPage + 1);
+            }
+        });
+
+        // Initialize pagination
+        setupPagination();
+        displayPage(1);
+    </script>
+</body>
+</html>
